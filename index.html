@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>BodyLevel - Fitness App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="mobile-login">
+  <h2>Connexion / Création de compte</h2>
+  <input id="username" placeholder="Nom">
+  <div id="levelWrapper">
+    <label for="levelSelect">Niveau :</label>
+    <select id="levelSelect">
+      <option value="debutant">Débutant</option>
+      <option value="moyen">Moyen</option>
+      <option value="confirme">Confirmé</option>
+      <option value="expert">Expert</option>
+    </select>
+  </div>
+  <div class="login-buttons">
+    <button id="loginBtn">Connexion</button>
+    <button id="createAccountBtn">Créer un compte</button>
+  </div>
+</div>
+
+<!-- APP PRINCIPALE -->
+<div id="app" style="display:none">
+  <div class="stats">
+    <p>XP : <span id="xp">0</span></p>
+    <p>Niveau : <span id="level">1</span></p>
+    <p>Streak : <span id="streak">0</span></p>
+    <p id="sessionCounter"></p>
+  </div>
+
+  <div class="xpbar">
+    <div id="xpfill"></div>
+  </div>
+
+  <h3>Nouvelle séance</h3>
+  <div class="workout-inputs">
+    <select id="exercise"></select>
+    <input id="reps" type="number" min="1" placeholder="Répétitions">
+    <button id="addExerciseBtn">Ajouter</button>
+  </div>
+
+  <ul id="workoutList"></ul>
+  <button id="finishWorkoutBtn">Terminer séance</button>
+
+  <h3>Progression</h3>
+  <canvas id="chart"></canvas>
+</div>
+
+<!-- FOOTER BOUTONS MOBILE -->
+<div id="bottomNav" style="display:none;">
+  <button id="navBadges">Badges</button>
+  <button id="navProfile">Profil</button>
+  <button id="navChallenge">Défi</button>
+</div>
+
+<!-- PROFIL MODAL -->
+<div id="profileModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="closeProfile" class="close">&times;</span>
+    <h3>Profil utilisateur</h3>
+    <p><strong>XP :</strong> <span id="profileXP"></span></p>
+    <p><strong>Niveau :</strong> <span id="profileLevel"></span></p>
+    <p><strong>Streak :</strong> <span id="profileStreak"></span></p>
+    <p><strong>Séances restantes :</strong> <span id="profileSessions"></span></p>
+    <p><strong>Âge :</strong> <span id="profileAge"></span></p>
+    <p><strong>Niveau choisi :</strong> <span id="profileTraining"></span></p>
+    <h4>Record personnel par exercice :</h4>
+    <ul id="recordsList"></ul>
+  </div>
+</div>
+
+<!-- BADGES MODAL -->
+<div id="badgesModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="closeBadges" class="close">&times;</span>
+    <h3>Badges</h3>
+    <ul id="badgesList"></ul>
+  </div>
+</div>
+
+<!-- CHALLENGE MODAL -->
+<div id="challengeModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="closeChallenge" class="close">&times;</span>
+    <h3>Défi du jour</h3>
+    <pre id="challengeText"></pre>
+  </div>
+</div>
+
+<!-- BADGE POPUP -->
+<div id="badgePopup" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 id="badgeName">Badge débloqué !</h3>
+  </div>
+</div>
+
+<!-- CONFETTI -->
+<canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+<div id="levelUpMsg" style="position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);color:#facc15;font-size:28px;font-weight:bold;display:none;">Bien joué !</div>
+
+<!-- SONS -->
+<audio id="xpSound" src="https://freesound.org/data/previews/337/337049_3238273-lq.mp3"></audio>
+<audio id="badgeSound" src="https://freesound.org/data/previews/337/337050_3238273-lq.mp3"></audio>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -261,19 +261,22 @@ window.onclick = (event) => {
   if (event.target === challenge) challenge.style.display = "none";
 };
 
-/* ---------- AJOUT PHOTO ---------- */
+/* ---------- AJOUT PHOTO (caméra + galerie mobile friendly) ---------- */
 document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
   let fileInput = document.createElement("input");
   fileInput.type = "file";
-  fileInput.accept = "image/*"; // on supprime capture pour mobile
+  fileInput.accept = "image/*";
+  fileInput.capture = "environment"; // permet de prendre une photo directement si le mobile le supporte
+
   fileInput.onchange = () => {
     let file = fileInput.files[0];
     if (!file) return;
+
     let reader = new FileReader();
     reader.onload = () => {
       let img = new Image();
       img.onload = () => {
-        // Redimensionner l'image pour mobile
+        // Redimensionner l'image pour mobile / performance
         const maxWidth = 600;
         const maxHeight = 600;
         let width = img.width;
@@ -290,9 +293,9 @@ document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.8); // compression 80%
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
 
-        // Sauvegarder
+        // Sauvegarde
         let users = getUsers();
         if (!users[currentUser].photos) users[currentUser].photos = [];
         users[currentUser].photos.push(dataUrl);
@@ -322,6 +325,7 @@ document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
     };
     reader.readAsDataURL(file);
   };
+
   fileInput.click();
 });
 

@@ -33,6 +33,14 @@ function getToday(){return new Date().toISOString().slice(0,10);}
 function levelXP(level){return Math.floor(100*Math.pow(1.5,level-1));}
 function getLevel(currentXP){let lvl=1;while(currentXP>=levelXP(lvl)) lvl++;return lvl;}
 
+/* ---------- SUPPRESSION DONNÉES ---------- */
+function clearAllData(){
+  if(confirm("Voulez-vous vraiment supprimer toutes les données ?")){
+    localStorage.removeItem("users");
+    location.reload();
+  }
+}
+
 /* ---------- DAILY CHALLENGE ---------- */
 function generateDailyChallenge(data){
   let today=getToday();

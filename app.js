@@ -264,31 +264,64 @@ window.onclick = (event) => {
 /* ---------- AJOUT PHOTO ---------- */
 document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
   let fileInput = document.createElement("input");
-  fileInput.type = "file"; fileInput.accept = "image/*"; fileInput.capture = "environment";
+  fileInput.type = "file";
+  fileInput.accept = "image/*"; // on supprime capture pour mobile
   fileInput.onchange = () => {
-    let file = fileInput.files[0]; if (!file) return;
+    let file = fileInput.files[0];
+    if (!file) return;
     let reader = new FileReader();
     reader.onload = () => {
-      let users = getUsers();
-      if (!users[currentUser].photos) users[currentUser].photos = [];
-      users[currentUser].photos.push(reader.result);
-      saveUsers(users);
+      let img = new Image();
+      img.onload = () => {
+        // Redimensionner l'image pour mobile
+        const maxWidth = 600;
+        const maxHeight = 600;
+        let width = img.width;
+        let height = img.height;
 
-      let photosDiv = document.getElementById("photosDiv");
-      if (!photosDiv) {
-        photosDiv = document.createElement("div");
-        photosDiv.id = "photosDiv";
-        photosDiv.style.display = "flex"; photosDiv.style.flexWrap = "wrap"; photosDiv.style.gap = "5px";
-        document.querySelector("#profileModal .modal-content").appendChild(photosDiv);
-      }
-      let img = document.createElement("img");
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8); // compression 80%
+
+        // Sauvegarder
+        let users = getUsers();
+        if (!users[currentUser].photos) users[currentUser].photos = [];
+        users[currentUser].photos.push(dataUrl);
+        saveUsers(users);
+
+        // Affichage
+        let photosDiv = document.getElementById("photosDiv");
+        if (!photosDiv) {
+          photosDiv = document.createElement("div");
+          photosDiv.id = "photosDiv";
+          photosDiv.style.display = "flex";
+          photosDiv.style.flexWrap = "wrap";
+          photosDiv.style.gap = "5px";
+          document.querySelector("#profileModal .modal-content").appendChild(photosDiv);
+        }
+        let imgEl = document.createElement("img");
+        imgEl.src = dataUrl;
+        imgEl.style.width = "80px";
+        imgEl.style.height = "80px";
+        imgEl.style.objectFit = "cover";
+        imgEl.style.borderRadius = "8px";
+        photosDiv.appendChild(imgEl);
+
+        document.getElementById("profileModal").style.display = "flex";
+      };
       img.src = reader.result;
-      img.style.width = "80px"; img.style.height = "80px"; img.style.objectFit = "cover"; img.style.borderRadius = "8px";
-      photosDiv.appendChild(img);
-
-      document.getElementById("profileModal").style.display = "flex";
     };
     reader.readAsDataURL(file);
   };
   fileInput.click();
 });
+

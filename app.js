@@ -261,12 +261,12 @@ window.onclick = (event) => {
   if (event.target === challenge) challenge.style.display = "none";
 };
 
-/* ---------- AJOUT PHOTO (caméra + galerie mobile friendly) ---------- */
+/* ---------- AJOUT PHOTO (caméra + galerie, sous "Photo quotidienne") ---------- */
 document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
   let fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = "image/*";
-  fileInput.capture = "environment"; // permet de prendre une photo directement si le mobile le supporte
+  fileInput.capture = "environment"; // caméra si mobile
 
   fileInput.onchange = () => {
     let file = fileInput.files[0];
@@ -276,12 +276,11 @@ document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
     reader.onload = () => {
       let img = new Image();
       img.onload = () => {
-        // Redimensionner l'image pour mobile / performance
+        // Redimensionner pour mobile
         const maxWidth = 600;
         const maxHeight = 600;
         let width = img.width;
         let height = img.height;
-
         if (width > maxWidth || height > maxHeight) {
           const ratio = Math.min(maxWidth / width, maxHeight / height);
           width = width * ratio;
@@ -301,23 +300,30 @@ document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
         users[currentUser].photos.push(dataUrl);
         saveUsers(users);
 
-        // Affichage
-        let photosDiv = document.getElementById("photosDiv");
-        if (!photosDiv) {
-          photosDiv = document.createElement("div");
-          photosDiv.id = "photosDiv";
-          photosDiv.style.display = "flex";
-          photosDiv.style.flexWrap = "wrap";
-          photosDiv.style.gap = "5px";
-          document.querySelector("#profileModal .modal-content").appendChild(photosDiv);
+        // Affichage sous "Photo quotidienne"
+        let profileModalContent = document.querySelector("#profileModal .modal-content");
+        let dailyPhotosContainer = document.getElementById("dailyPhotosContainer");
+        if (!dailyPhotosContainer) {
+          // Créer le titre et le conteneur une seule fois
+          const title = document.createElement("h4");
+          title.innerText = "Photo quotidienne";
+          profileModalContent.appendChild(title);
+
+          dailyPhotosContainer = document.createElement("div");
+          dailyPhotosContainer.id = "dailyPhotosContainer";
+          dailyPhotosContainer.style.display = "flex";
+          dailyPhotosContainer.style.flexWrap = "wrap";
+          dailyPhotosContainer.style.gap = "5px";
+          profileModalContent.appendChild(dailyPhotosContainer);
         }
+
         let imgEl = document.createElement("img");
         imgEl.src = dataUrl;
         imgEl.style.width = "80px";
         imgEl.style.height = "80px";
         imgEl.style.objectFit = "cover";
         imgEl.style.borderRadius = "8px";
-        photosDiv.appendChild(imgEl);
+        dailyPhotosContainer.appendChild(imgEl);
 
         document.getElementById("profileModal").style.display = "flex";
       };

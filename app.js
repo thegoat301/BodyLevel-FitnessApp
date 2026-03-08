@@ -4,8 +4,7 @@ let age=0, maxSessions=0, trainingLevel="debutant";
 
 /* XP par exercice */
 const xpValues={pushups:1.2, squats:1, plank:0.4, lunges:1, mountain:0.7, burpees:3, jumping:0.5, dips:2, crunch:0.8, legraise:1};
-
-/* Exercices par niveau */
+/* exercices par niveau */
 const exercisesByLevel={
   debutant:["squats","crunch","jumping","plank"],
   moyen:["pushups","lunges","mountain"],
@@ -13,7 +12,7 @@ const exercisesByLevel={
   expert:["burpees"]
 };
 
-/* Badges */
+/* badges */
 const BADGES={
   motivated:{name:"🔥 Motivé",condition:u=>u.streak>=3},
   regular:{name:"💪 Régulier",condition:u=>u.streak>=7},
@@ -22,7 +21,7 @@ const BADGES={
   discipline:{name:"🧠 Discipline",condition:u=>u.history.length>=20}
 };
 
-/* Défis quotidiens */
+/* défis possibles */
 const DAILY_CHALLENGES=[
   {type:"reps",target:50},{type:"reps",target:80},{type:"xp",target:150},{type:"xp",target:300},{type:"exercises",target:2},{type:"exercises",target:3}
 ];
@@ -33,15 +32,6 @@ function saveUsers(users){localStorage.setItem("users",JSON.stringify(users));}
 function getToday(){return new Date().toISOString().slice(0,10);}
 function levelXP(level){return Math.floor(100*Math.pow(1.5,level-1));}
 function getLevel(currentXP){let lvl=1;while(currentXP>=levelXP(lvl)) lvl++;return lvl;}
-
-/* ---------- SUPPRESSION TOTALE ---------- */
-function clearAllData(){
-  if(confirm("⚠️ Voulez-vous vraiment supprimer toutes vos données ?")){
-    localStorage.clear();
-    alert("Toutes les données ont été supprimées.");
-    location.reload();
-  }
-}
 
 /* ---------- DAILY CHALLENGE ---------- */
 function generateDailyChallenge(data){
@@ -57,7 +47,7 @@ function generateDailyChallenge(data){
 function showBadge(name){
   let popup=document.getElementById("badgePopup");
   document.getElementById("badgeName").innerText=name;
-  document.getElementById("badgeSound").play();
+  let sound=document.getElementById("badgeSound"); if(sound) sound.play();
   popup.style.display="flex";
   setTimeout(()=>{popup.style.display="none";},2000);
 }
@@ -94,7 +84,7 @@ document.getElementById("createAccountBtn").onclick=()=>{
   age=parseInt(prompt("Quel âge as-tu ?"));
   if(age<=10) maxSessions=3; else if(age<=20) maxSessions=5; else if(age<=25) maxSessions=8; else maxSessions=10;
   trainingLevel=document.getElementById("levelSelect").value;
-  users[username]={ xp:0, streak:0, history:[], records:{}, photos:[], age, maxSessions, trainingLevel, dailySessions:{}, badges:[], challenge:{}, lastWorkout:null };
+  users[username]={ xp:0, streak:0, history:[], records:{}, age, maxSessions, trainingLevel, dailySessions:{}, badges:[], challenge:{}, photos:[], lastWorkout:null };
   saveUsers(users);
   alert("Compte créé !");
   const levelWrapper=document.getElementById("levelWrapper"); if(levelWrapper) levelWrapper.remove();
@@ -198,44 +188,36 @@ function updateChart(){
 /* ---------- NAVIGATION BOUTONS BAS ---------- */
 document.getElementById("navProfile").onclick=()=>{
   let users=getUsers(); let data=users[currentUser];
-  document.getElementById("profileName").innerText=currentUser;
   document.getElementById("profileXP").innerText=data.xp;
   document.getElementById("profileLevel").innerText=getLevel(data.xp);
   document.getElementById("profileStreak").innerText=data.streak;
   document.getElementById("profileAge").innerText=data.age;
   document.getElementById("profileTraining").innerText=data.trainingLevel;
-  let today=getToday(); let done=data.dailySessions[today]||0;
-  document.getElementById("profileSessions").innerText=(maxSessions-done)+" / "+maxSessions;
 
-  /* records */
+  /* Afficher le nom de l'utilisateur */
+  document.getElementById("profileName")?.remove();
+  let h4=document.createElement("h4"); h4.id="profileName"; h4.innerText="Nom : "+currentUser;
+  document.querySelector("#profileModal .modal-content").prepend(h4);
+
   let list=document.getElementById("recordsList"); list.innerHTML="";
   Object.keys(data.records).forEach(ex=>{ let li=document.createElement("li"); li.innerText=ex+" : "+data.records[ex]; list.appendChild(li); });
 
-  /* photos */
-  let photos=document.getElementById("photosContainer"); photos.innerHTML="";
-  data.photos.forEach((p,idx)=>{
+  /* Afficher les photos */
+  let photosDiv=document.getElementById("photosDiv");
+  if(!photosDiv){
+    photosDiv=document.createElement("div"); photosDiv.id="photosDiv"; photosDiv.style.display="flex"; photosDiv.style.flexWrap="wrap"; photosDiv.style.gap="5px";
+    document.querySelector("#profileModal .modal-content").appendChild(photosDiv);
+  }
+  photosDiv.innerHTML="";
+  data.photos.forEach(p=>{
     let img=document.createElement("img"); img.src=p; img.style.width="80px"; img.style.height="80px"; img.style.objectFit="cover"; img.style.borderRadius="8px";
-    photos.appendChild(img);
+    photosDiv.appendChild(img);
   });
 
   document.getElementById("profileModal").style.display="flex";
 };
 
-/* Ajouter photo */
-document.getElementById("addPhotoBtn").onclick=()=>{
-  let fileInput=document.createElement("input"); fileInput.type="file"; fileInput.accept="image/*"; 
-  fileInput.onchange=()=>{ 
-    let file=fileInput.files[0]; if(!file) return;
-    let reader=new FileReader();
-    reader.onload=()=>{ 
-      let users=getUsers(); users[currentUser].photos.push(reader.result); saveUsers(users); 
-      document.getElementById("navProfile").click();
-    };
-    reader.readAsDataURL(file);
-  };
-  fileInput.click();
-};
-
+/* ---------- BADGES ---------- */
 document.getElementById("navBadges").onclick=()=>{
   let users=getUsers(); let data=users[currentUser];
   let list=document.getElementById("badgesList"); list.innerHTML="";
@@ -251,6 +233,8 @@ document.getElementById("navBadges").onclick=()=>{
   });
   document.getElementById("badgesModal").style.display="flex";
 };
+
+/* ---------- CHALLENGE ---------- */
 document.getElementById("navChallenge").onclick=()=>{
   let users=getUsers(); let data=users[currentUser]; let c=data.challenge; let text="";
   if(c.type==="reps") text="Faire "+c.target+" répétitions";
@@ -273,4 +257,28 @@ window.onclick=(event)=>{
   if(event.target===profile) profile.style.display="none";
   if(event.target===badges) badges.style.display="none";
   if(event.target===challenge) challenge.style.display="none";
+};
+
+/* ---------- AJOUTER PHOTO VIA CAMERA / IMPORT ---------- */
+document.getElementById("addPhotoBtn").onclick = () => {
+    let fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.capture = "environment"; // ouvre la caméra
+
+    fileInput.onchange = () => {
+        let file = fileInput.files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.onload = () => {
+            let users = getUsers();
+            users[currentUser].photos.push(reader.result);
+            saveUsers(users);
+            // recharge le profil pour afficher la photo
+            document.getElementById("navProfile").click();
+        };
+        reader.readAsDataURL(file);
+    };
+    fileInput.click();
 };

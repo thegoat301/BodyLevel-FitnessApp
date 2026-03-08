@@ -26,7 +26,6 @@
   <div class="login-buttons">
     <button id="loginBtn">Connexion</button>
     <button id="createAccountBtn">Créer un compte</button>
-    <button id="resetAppBtn" class="danger-btn">Réinitialiser toutes les données</button>
   </div>
 </div>
 
@@ -68,15 +67,23 @@
 <div id="profileModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="closeProfile" class="close">&times;</span>
-    <h3>Profil utilisateur : <span id="profileName"></span></h3>
+    <h3>Profil utilisateur</h3>
+    <p><strong>Nom :</strong> <span id="profileName"></span></p>
     <p><strong>XP :</strong> <span id="profileXP"></span></p>
     <p><strong>Niveau :</strong> <span id="profileLevel"></span></p>
     <p><strong>Streak :</strong> <span id="profileStreak"></span></p>
     <p><strong>Séances restantes :</strong> <span id="profileSessions"></span></p>
     <p><strong>Âge :</strong> <span id="profileAge"></span></p>
     <p><strong>Niveau choisi :</strong> <span id="profileTraining"></span></p>
+
     <h4>Record personnel par exercice :</h4>
     <ul id="recordsList"></ul>
+
+    <h4>Photos quotidiennes :</h4>
+    <button id="addPhotoBtn">Prendre / Importer photo</button>
+    <div id="photosContainer" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;"></div>
+
+    <button onclick="clearAllData()" style="background:#ef4444;margin-top:10px;">Supprimer toutes les données</button>
   </div>
 </div>
 

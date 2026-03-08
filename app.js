@@ -33,6 +33,14 @@ function getToday() { return new Date().toISOString().slice(0, 10); }
 function levelXP(level) { return Math.floor(100 * Math.pow(1.5, level - 1)); }
 function getLevel(currentXP) { let lvl = 1; while (currentXP >= levelXP(lvl)) lvl++; return lvl; }
 
+/* ---------- SUPPRESSION DONNEES ---------- */
+function clearAllData() {
+  if (confirm("Voulez-vous vraiment supprimer toutes les données ?")) {
+    localStorage.removeItem("users");
+    location.reload();
+  }
+}
+
 /* ---------- DAILY CHALLENGE ---------- */
 function generateDailyChallenge(data) {
   let today = getToday();
@@ -196,17 +204,14 @@ document.getElementById("navProfile").onclick = () => {
   document.getElementById("profileAge").innerText = data.age;
   document.getElementById("profileTraining").innerText = data.trainingLevel;
 
-  /* Nom de l'utilisateur */
   if (!document.getElementById("profileName")) {
     let h4 = document.createElement("h4"); h4.id = "profileName"; document.querySelector("#profileModal .modal-content").prepend(h4);
   }
   document.getElementById("profileName").innerText = "Nom : " + currentUser;
 
-  /* Records */
   let list = document.getElementById("recordsList"); list.innerHTML = "";
   Object.keys(data.records).forEach(ex => { let li = document.createElement("li"); li.innerText = ex + " : " + data.records[ex]; list.appendChild(li); });
 
-  /* Photos */
   let photosDiv = document.getElementById("photosDiv");
   if (photosDiv) photosDiv.remove();
   photosDiv = document.createElement("div"); photosDiv.id = "photosDiv"; photosDiv.style.display = "flex"; photosDiv.style.flexWrap = "wrap"; photosDiv.style.gap = "5px";
@@ -269,7 +274,6 @@ document.getElementById("addPhotoBtn")?.addEventListener("click", () => {
       users[currentUser].photos.push(reader.result);
       saveUsers(users);
 
-      // update photo section
       let photosDiv = document.getElementById("photosDiv");
       if (!photosDiv) {
         photosDiv = document.createElement("div");
